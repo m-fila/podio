@@ -87,7 +87,7 @@ In the following tables a convention from `Collection` is used: `iterator` stand
 | `std::input_or_output_iterator` | ✔️ yes | ✔️ yes |
 | `std::input_iterator` | ✔️ yes | ✔️ yes |
 | `std::output_iterator` | ❌ no | ❌ no |
-| `std::forward_iterator` | ❌ no | ❌ no |
+| `std::forward_iterator` | ✔️ yes | ✔️ yes |
 | `std::bidirectional_iterator` | ❌ no | ❌ no |
 | `std::random_access_iterator` | ❌ no | ❌ no |
 | `std::contiguous_iterator` | ❌ no | ❌ no |

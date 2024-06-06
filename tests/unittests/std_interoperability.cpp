@@ -419,7 +419,7 @@ TEST_CASE("Collection and iterator concepts") {
     STATIC_REQUIRE(std::input_or_output_iterator<iterator>);
     STATIC_REQUIRE(std::input_iterator<iterator>);
     DOCUMENTED_STATIC_FAILURE(std::output_iterator<iterator, CollectionType::value_type>);
-    DOCUMENTED_STATIC_FAILURE(std::forward_iterator<iterator>);
+    STATIC_REQUIRE(std::forward_iterator<iterator>);
     DOCUMENTED_STATIC_FAILURE(std::bidirectional_iterator<iterator>);
     DOCUMENTED_STATIC_FAILURE(std::random_access_iterator<iterator>);
     DOCUMENTED_STATIC_FAILURE(std::contiguous_iterator<iterator>);
@@ -432,7 +432,7 @@ TEST_CASE("Collection and iterator concepts") {
     STATIC_REQUIRE(std::input_or_output_iterator<const_iterator>);
     STATIC_REQUIRE(std::input_iterator<const_iterator>);
     DOCUMENTED_STATIC_FAILURE(std::output_iterator<const_iterator, CollectionType::value_type>);
-    DOCUMENTED_STATIC_FAILURE(std::forward_iterator<const_iterator>);
+    STATIC_REQUIRE(std::forward_iterator<const_iterator>);
     DOCUMENTED_STATIC_FAILURE(std::bidirectional_iterator<const_iterator>);
     DOCUMENTED_STATIC_FAILURE(std::random_access_iterator<const_iterator>);
     DOCUMENTED_STATIC_FAILURE(std::contiguous_iterator<const_iterator>);

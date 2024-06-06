@@ -9,7 +9,7 @@ public:
   using pointer = {{ prefix }}{{ class.bare_type }}*;
   using iterator_category = std::input_iterator_tag;
 #if (__cplusplus >= 202002L)
-  using iterator_concept = std::input_iterator_tag;
+  using iterator_concept = std::forward_iterator_tag;
 #endif
 
   {{ iterator_type }}(size_t index, const {{ class.bare_type }}ObjPointerContainer* collection) : m_index(index), m_object({{ ptr_init }}), m_collection(collection) {}
