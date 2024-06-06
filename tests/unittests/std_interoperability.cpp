@@ -770,8 +770,9 @@ TEST_CASE("Collection iterators", "[collection][container][iterator][std]") {
     // STATIC_REQUIRE(std::is_convertible_v<decltype(std::declval<iterator&>()--), const iterator &>);
     // {
     //   auto coll = CollectionType();
-    //   auto a = coll.begin();
-    //   auto b = coll.begin();
+    //   coll.create();
+    //   auto a = ++coll.begin();
+    //   auto b = ++coll.begin();
     //   REQUIRE(--(++a) == b);
     //   REQUIRE(a == b);
     //   REQUIRE(--a == --b);
@@ -782,8 +783,9 @@ TEST_CASE("Collection iterators", "[collection][container][iterator][std]") {
     // STATIC_REQUIRE(std::is_convertible_v<decltype(std::declval<const_iterator&>()--), const const_iterator &>);
     // {
     //   auto coll = CollectionType();
-    //   auto a = coll.begin();
-    //   auto b = coll.begin();
+    //   coll.create();
+    //   auto a = ++coll.cbegin();
+    //   auto b = ++coll.cbegin();
     //   REQUIRE(--(++a) == b);
     //   REQUIRE(a == b);
     //   REQUIRE(--a == --b);
