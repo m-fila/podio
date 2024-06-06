@@ -74,7 +74,7 @@ In the following tables a convention from `Collection` is used: `iterator` stand
 | [LegacyInputIterator](https://en.cppreference.com/w/cpp/named_req/InputIterator) | ✔️ yes ([see below](#legacyinputiterator)) | ✔️ yes ([see below](#legacyinputiterator)) |
 | [LegacyForwardIterator](https://en.cppreference.com/w/cpp/named_req/ForwardIterator) | ❌ no ([see below](#legacyforwarditerator)) | ❌ no ([see below](#legacyforwarditerator)) |
 | [LegacyOutputIterator](https://en.cppreference.com/w/cpp/named_req/OutputIterator) | ❌ no ([see below](#legacyoutputiterator)) | ❌ no ([see below](#legacyoutputiterator)) |
-| [LegacyBidirectionalIterator](https://en.cppreference.com/w/cpp/named_req/BidirectionalIterator) | ❌ no | ❌ no |
+| [LegacyBidirectionalIterator](https://en.cppreference.com/w/cpp/named_req/BidirectionalIterator) | ❌ no ([see below](#legacybidirectionaliterator)) | ❌ no ([see below](#legacybidirectionaliterator)) |
 | [LegacyRandomAccessIterator](https://en.cppreference.com/w/cpp/named_req/RandomAccessIterator) | ❌ no | ❌ no |
 | [LegacyContiguousIterator](https://en.cppreference.com/w/cpp/named_req/ContiguousIterator) | ❌ no | ❌ no |
 
@@ -143,6 +143,18 @@ In addition to the *LegacyForwardIterator* the C++ standard specifies also the *
 |------------|-------------|-----------|-------------------------------------------|---------|
 | `i++` | `It` | Same as `It ip = i; ++i; return ip;` | ✔️ yes / ✔️ yes | |
 | `*i++` | `reference` | | ✔️ yes / ✔️ yes | |
+
+### LegacyBidirectionalIterator
+
+| Requirement | Fulfilled by `iterator`/`const_iterator`? | Comment |
+|-------------|-------------------------------------------|---------|
+| [*LegacyForwardIterator*](https://en.cppreference.com/w/cpp/named_req/ForwardIterator) | ❌ no / ❌ no | [See above](#legacyforwarditerator) |
+
+| Expression | Return type | Semantics | Fulfilled by `iterator`/`const_iterator`? | Comment |
+|------------|-------------|-----------|-------------------------------------------|---------|
+| `--a` | `It&` | | ❌ no / ❌ no | Pre-decrement not defined |
+| `a--` | Convertible to `const It&` | Same as `It temp = a; --a; return temp;` | ❌ no / ❌ no | Post-decrement not defined |
+| `*a--` | `reference` | | ❌ no / ❌ no | Post-decrement not defined |
 
 ### LegacyOutputIterator
 

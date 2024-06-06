@@ -229,6 +229,22 @@ struct has_postincrement<T, std::void_t<decltype(std::declval<T&>()++)>> : std::
 template <typename T>
 inline constexpr bool has_postincrement_v = has_postincrement<T>::value;
 
+// T::operator--() (predecrement)
+template <typename, typename = void>
+struct has_predecrement : std::false_type {};
+template <typename T>
+struct has_predecrement<T, std::void_t<decltype(--std::declval<T&>())>> : std::true_type {};
+template <typename T>
+inline constexpr bool has_predecrement_v = has_predecrement<T>::value;
+
+// T::operator--(int) (postdecrement)
+template <typename, typename = void>
+struct has_postdecrement : std::false_type {};
+template <typename T>
+struct has_postdecrement<T, std::void_t<decltype(std::declval<T&>()--)>> : std::true_type {};
+template <typename T>
+inline constexpr bool has_postdecrement_v = has_postdecrement<T>::value;
+
 // *It = val
 template <typename, typename, typename = void>
 struct has_dereference_assignment : std::false_type {};
@@ -444,298 +460,349 @@ TEST_CASE("Collection iterators", "[collection][container][iterator][std]") {
   // the checks are duplicated for iterator and const_iterator as expectations on them are slightly different
 
   // nested sections as the requirements make a hierarchy
-  SECTION("LegacyForwardIterator") {
+  SECTION("LegacyBidirectionalIterator") {
 
-    // LegacyForwardIterator requires LegacyInputIterator
-    SECTION("LegacyInputIterator") {
+    // LegacyBidirectionalIterator requires LegacyForwardIterator
+    SECTION("LegacyForwardIterator") {
 
-      // LegacyInputIterator requires LegacyIterator
-      SECTION("LegacyIterator") {
+      // LegacyForwardIterator requires LegacyInputIterator
+      SECTION("LegacyInputIterator") {
 
-        // CopyConstructible
-        // iterator
-        STATIC_REQUIRE(std::is_move_constructible_v<iterator>);
-        STATIC_REQUIRE(std::is_copy_constructible_v<iterator>);
-        // const_iterator
-        STATIC_REQUIRE(std::is_move_constructible_v<const_iterator>);
-        STATIC_REQUIRE(std::is_copy_constructible_v<const_iterator>);
+        // LegacyInputIterator requires LegacyIterator
+        SECTION("LegacyIterator") {
 
-        // CopyAssignable
-        // iterator
-        STATIC_REQUIRE(std::is_move_assignable_v<iterator>);
-        STATIC_REQUIRE(std::is_copy_assignable_v<iterator>);
-        // const_iterator
-        STATIC_REQUIRE(std::is_move_assignable_v<const_iterator>);
-        STATIC_REQUIRE(std::is_copy_assignable_v<const_iterator>);
+          // CopyConstructible
+          // iterator
+          STATIC_REQUIRE(std::is_move_constructible_v<iterator>);
+          STATIC_REQUIRE(std::is_copy_constructible_v<iterator>);
+          // const_iterator
+          STATIC_REQUIRE(std::is_move_constructible_v<const_iterator>);
+          STATIC_REQUIRE(std::is_copy_constructible_v<const_iterator>);
 
-        // Destructible
-        // iterator
-        STATIC_REQUIRE(std::is_nothrow_destructible_v<iterator>);
-        // const_iterator
-        STATIC_REQUIRE(std::is_nothrow_destructible_v<const_iterator>);
+          // CopyAssignable
+          // iterator
+          STATIC_REQUIRE(std::is_move_assignable_v<iterator>);
+          STATIC_REQUIRE(std::is_copy_assignable_v<iterator>);
+          // const_iterator
+          STATIC_REQUIRE(std::is_move_assignable_v<const_iterator>);
+          STATIC_REQUIRE(std::is_copy_assignable_v<const_iterator>);
 
-        // Swappable
-        // iterator
-        STATIC_REQUIRE(std::is_swappable_v<iterator&>);
-        // const_iterator
-        STATIC_REQUIRE(std::is_swappable_v<const_iterator&>);
+          // Destructible
+          // iterator
+          STATIC_REQUIRE(std::is_nothrow_destructible_v<iterator>);
+          // const_iterator
+          STATIC_REQUIRE(std::is_nothrow_destructible_v<const_iterator>);
+
+          // Swappable
+          // iterator
+          STATIC_REQUIRE(std::is_swappable_v<iterator&>);
+          // const_iterator
+          STATIC_REQUIRE(std::is_swappable_v<const_iterator&>);
 
 #if (__cplusplus < 202002L)
-        // std::iterator_traits<It>::value_type (required prior to C++20)
-        // iterator
-        DOCUMENTED_STATIC_FAILURE(traits::has_value_type_v<std::iterator_traits<iterator>>);
-        // const_iterator
-        DOCUMENTED_STATIC_FAILURE(traits::has_value_type_v<std::iterator_traits<const_iterator>>);
+          // std::iterator_traits<It>::value_type (required prior to C++20)
+          // iterator
+          DOCUMENTED_STATIC_FAILURE(traits::has_value_type_v<std::iterator_traits<iterator>>);
+          // const_iterator
+          DOCUMENTED_STATIC_FAILURE(traits::has_value_type_v<std::iterator_traits<const_iterator>>);
 #endif
-        // std::iterator_traits<It>::difference_type
-        // iterator
-        STATIC_REQUIRE(traits::has_difference_type_v<std::iterator_traits<iterator>>);
-        // const_iterator
-        STATIC_REQUIRE(traits::has_difference_type_v<std::iterator_traits<const_iterator>>);
+          // std::iterator_traits<It>::difference_type
+          // iterator
+          STATIC_REQUIRE(traits::has_difference_type_v<std::iterator_traits<iterator>>);
+          // const_iterator
+          STATIC_REQUIRE(traits::has_difference_type_v<std::iterator_traits<const_iterator>>);
 
-        // std::iterator_traits<It>::reference
-        // iterator
-        STATIC_REQUIRE(traits::has_reference_v<std::iterator_traits<iterator>>);
-        // const_iterator
-        STATIC_REQUIRE(traits::has_reference_v<std::iterator_traits<const_iterator>>);
+          // std::iterator_traits<It>::reference
+          // iterator
+          STATIC_REQUIRE(traits::has_reference_v<std::iterator_traits<iterator>>);
+          // const_iterator
+          STATIC_REQUIRE(traits::has_reference_v<std::iterator_traits<const_iterator>>);
 
-        // std::iterator_traits<It>::pointer
-        // iterator
-        STATIC_REQUIRE(traits::has_pointer_v<std::iterator_traits<iterator>>);
-        // const_iterator
-        STATIC_REQUIRE(traits::has_pointer_v<std::iterator_traits<const_iterator>>);
+          // std::iterator_traits<It>::pointer
+          // iterator
+          STATIC_REQUIRE(traits::has_pointer_v<std::iterator_traits<iterator>>);
+          // const_iterator
+          STATIC_REQUIRE(traits::has_pointer_v<std::iterator_traits<const_iterator>>);
 
-        // std::iterator_traits<It>::iterator_category
-        // iterator
-        STATIC_REQUIRE(traits::has_iterator_category_v<std::iterator_traits<iterator>>);
-        // const_iterator
-        STATIC_REQUIRE(traits::has_iterator_category_v<std::iterator_traits<const_iterator>>);
+          // std::iterator_traits<It>::iterator_category
+          // iterator
+          STATIC_REQUIRE(traits::has_iterator_category_v<std::iterator_traits<iterator>>);
+          // const_iterator
+          STATIC_REQUIRE(traits::has_iterator_category_v<std::iterator_traits<const_iterator>>);
 
-        // *r
+          // *r
+          // iterator
+          STATIC_REQUIRE(traits::has_indirection_v<iterator>);
+          STATIC_REQUIRE_FALSE(std::is_same_v<void, decltype(*std::declval<iterator&>())>);
+          // const_iterator
+          STATIC_REQUIRE(traits::has_indirection_v<const_iterator>);
+          STATIC_REQUIRE_FALSE(std::is_same_v<void, decltype(*std::declval<const_iterator&>())>);
+
+          // ++r
+          // iterator
+          STATIC_REQUIRE(traits::has_preincrement_v<iterator&>);
+          STATIC_REQUIRE(std::is_same_v<decltype(++std::declval<iterator&>()), iterator&>);
+          // const_iterator
+          STATIC_REQUIRE(traits::has_preincrement_v<const_iterator&>);
+          STATIC_REQUIRE(std::is_same_v<decltype(++std::declval<const_iterator&>()), const_iterator&>);
+
+        } // end of LegacyIterator
+
+        // EqualityComparable
+        // iterator
+        STATIC_REQUIRE(traits::has_equality_comparator_v<iterator>);
+        STATIC_REQUIRE(std::is_convertible_v<decltype(std::declval<iterator>() != std::declval<iterator>()), bool>);
+        // const_iterator
+        STATIC_REQUIRE(traits::has_equality_comparator_v<const_iterator>);
+        STATIC_REQUIRE(
+            std::is_convertible_v<decltype(std::declval<const_iterator>() != std::declval<const_iterator>()), bool>);
+
+        // i != j (contextually convertible)
+        // iterator
+        STATIC_REQUIRE(traits::has_inequality_comparator_v<iterator>);
+        STATIC_REQUIRE(std::is_constructible_v<bool, decltype(std::declval<iterator>() != std::declval<iterator>())>);
+        // const_ iterator
+        STATIC_REQUIRE(traits::has_inequality_comparator_v<const_iterator>);
+        STATIC_REQUIRE(
+            std::is_constructible_v<bool, decltype(std::declval<const_iterator>() != std::declval<const_iterator>())>);
+
+        // *i
         // iterator
         STATIC_REQUIRE(traits::has_indirection_v<iterator>);
-        STATIC_REQUIRE_FALSE(std::is_same_v<void, decltype(*std::declval<iterator&>())>);
+        STATIC_REQUIRE(traits::has_reference_v<iterator>);
+        STATIC_REQUIRE(std::is_same_v<std::iterator_traits<iterator>::reference, decltype(*std::declval<iterator>())>);
+        STATIC_REQUIRE(traits::has_value_type_v<iterator>);
+        STATIC_REQUIRE(
+            std::is_convertible_v<decltype(*std::declval<iterator>()), std::iterator_traits<iterator>::value_type>);
         // const_iterator
         STATIC_REQUIRE(traits::has_indirection_v<const_iterator>);
-        STATIC_REQUIRE_FALSE(std::is_same_v<void, decltype(*std::declval<const_iterator&>())>);
+        STATIC_REQUIRE(traits::has_reference_v<const_iterator>);
+        STATIC_REQUIRE(
+            std::is_same_v<std::iterator_traits<const_iterator>::reference, decltype(*std::declval<const_iterator>())>);
+        STATIC_REQUIRE(traits::has_value_type_v<const_iterator>);
+        STATIC_REQUIRE(std::is_convertible_v<decltype(*std::declval<const_iterator>()),
+                                             std::iterator_traits<const_iterator>::value_type>);
+
+        // i->m
+        // iterator
+        STATIC_REQUIRE(traits::has_member_of_pointer_v<iterator>);
+        STATIC_REQUIRE(traits::has_indirection_v<iterator>);
+        STATIC_REQUIRE(std::is_same_v<decltype(std::declval<iterator>()->energy()),
+                                      decltype((*std::declval<iterator>()).energy())>);
+        // const_iterator
+        STATIC_REQUIRE(traits::has_member_of_pointer_v<const_iterator>);
+        STATIC_REQUIRE(traits::has_indirection_v<const_iterator>);
+        STATIC_REQUIRE(std::is_same_v<decltype(std::declval<const_iterator>()->energy()),
+                                      decltype((*std::declval<const_iterator>()).energy())>);
 
         // ++r
         // iterator
-        STATIC_REQUIRE(traits::has_preincrement_v<iterator&>);
+        STATIC_REQUIRE(traits::has_preincrement_v<iterator>);
         STATIC_REQUIRE(std::is_same_v<decltype(++std::declval<iterator&>()), iterator&>);
         // const_iterator
-        STATIC_REQUIRE(traits::has_preincrement_v<const_iterator&>);
+        STATIC_REQUIRE(traits::has_preincrement_v<const_iterator>);
         STATIC_REQUIRE(std::is_same_v<decltype(++std::declval<const_iterator&>()), const_iterator&>);
 
-      } // end of LegacyIterator
+        // (void)r++
+        // iterator
+        STATIC_REQUIRE(traits::has_preincrement_v<iterator>);
+        STATIC_REQUIRE(traits::has_postincrement_v<iterator>);
+        STATIC_REQUIRE(
+            std::is_same_v<decltype((void)++std::declval<iterator&>()), decltype((void)std::declval<iterator&>()++)>);
+        // const_iterator
+        STATIC_REQUIRE(traits::has_preincrement_v<const_iterator>);
+        STATIC_REQUIRE(traits::has_postincrement_v<const_iterator>);
+        STATIC_REQUIRE(std::is_same_v<decltype((void)++std::declval<const_iterator&>()),
+                                      decltype((void)std::declval<const_iterator&>()++)>);
 
-      // EqualityComparable
+        // *r++
+        // iterator
+        STATIC_REQUIRE(traits::has_indirection_v<iterator>);
+        STATIC_REQUIRE(traits::has_value_type_v<std::iterator_traits<iterator>>);
+        STATIC_REQUIRE(traits::has_postincrement_v<iterator>);
+        STATIC_REQUIRE(
+            std::is_convertible_v<decltype(*std::declval<iterator&>()++), std::iterator_traits<iterator>::value_type>);
+        // const_iterator
+        STATIC_REQUIRE(traits::has_indirection_v<const_iterator>);
+        STATIC_REQUIRE(traits::has_value_type_v<std::iterator_traits<const_iterator>>);
+        STATIC_REQUIRE(traits::has_postincrement_v<const_iterator>);
+        STATIC_REQUIRE(std::is_convertible_v<decltype(*std::declval<const_iterator&>()++),
+                                             std::iterator_traits<const_iterator>::value_type>);
+
+        // iterator_category - not strictly necessary but advised
+        // iterator
+        STATIC_REQUIRE(traits::has_iterator_category_v<std::iterator_traits<iterator>>);
+        STATIC_REQUIRE(std::is_base_of_v<std::input_iterator_tag, std::iterator_traits<iterator>::iterator_category>);
+        // const_iterator
+        STATIC_REQUIRE(traits::has_iterator_category_v<std::iterator_traits<const_iterator>>);
+        STATIC_REQUIRE(
+            std::is_base_of_v<std::input_iterator_tag, std::iterator_traits<const_iterator>::iterator_category>);
+
+      } // end of LegacyInputIterator
+
+      // Mutable LegacyForwardIterator (LegacyForwardIterator that is also LegacyOutputIterator):
+      // - reference same as value_type& or value_type&&
+      // iterator
+      STATIC_REQUIRE(traits::has_reference_v<iterator>);
+      STATIC_REQUIRE(traits::has_value_type_v<iterator>);
+      DOCUMENTED_STATIC_FAILURE(
+          std::is_same_v<std::iterator_traits<iterator>::reference, std::iterator_traits<iterator>::value_type&> ||
+          std::is_same_v<std::iterator_traits<iterator>::reference, std::iterator_traits<iterator>::value_type&&>);
+      // const_iterator
+      STATIC_REQUIRE(traits::has_reference_v<const_iterator>);
+      STATIC_REQUIRE(traits::has_value_type_v<const_iterator>);
+      DOCUMENTED_STATIC_FAILURE(std::is_same_v<std::iterator_traits<const_iterator>::reference,
+                                               std::iterator_traits<const_iterator>::value_type&> ||
+                                std::is_same_v<std::iterator_traits<const_iterator>::reference,
+                                               std::iterator_traits<const_iterator>::value_type&&>);
+
+      // (Immutable) iterator:
+      // - reference same as const value_type& or const value_type&&
+      // iterator
+      STATIC_REQUIRE(traits::has_reference_v<iterator>);
+      STATIC_REQUIRE(traits::has_value_type_v<iterator>);
+      DOCUMENTED_STATIC_FAILURE(std::is_same_v<std::iterator_traits<iterator>::reference,
+                                               const std::iterator_traits<iterator>::value_type&> ||
+                                std::is_same_v<std::iterator_traits<iterator>::reference,
+                                               const std::iterator_traits<iterator>::value_type&&>);
+      // const_iterator
+      STATIC_REQUIRE(traits::has_reference_v<const_iterator>);
+      STATIC_REQUIRE(traits::has_value_type_v<const_iterator>);
+      DOCUMENTED_STATIC_FAILURE(std::is_same_v<std::iterator_traits<const_iterator>::reference,
+                                               const std::iterator_traits<const_iterator>::value_type&> ||
+                                std::is_same_v<std::iterator_traits<const_iterator>::reference,
+                                               const std::iterator_traits<const_iterator>::value_type&&>);
+
+      // DefaultConstructible
+      // iterator
+      STATIC_REQUIRE(std::is_default_constructible_v<iterator>);
+      // const_iterator
+      STATIC_REQUIRE(std::is_default_constructible_v<const_iterator>);
+
+      // Multipass guarantee
+      // iterator
+      {
+        CollectionType coll;
+        for (int i = 0; i < 3; ++i) {
+          coll.create();
+        }
+        // iterator
+        auto a = coll.begin();
+        auto b = coll.begin();
+        REQUIRE(a == b);
+        REQUIRE(*a == *b);
+        REQUIRE(++a == ++b);
+        REQUIRE(*a == *b);
+        STATIC_REQUIRE(std::is_copy_constructible_v<iterator>);
+        auto a_copy = a;
+        ++a_copy;
+        REQUIRE(a == b);
+        REQUIRE(*a == *b);
+
+        // const_iterator
+        auto ca = coll.cbegin();
+        auto cb = coll.cbegin();
+        REQUIRE(ca == cb);
+        REQUIRE(*ca == *cb);
+        REQUIRE(++ca == ++cb);
+        REQUIRE(*ca == *cb);
+        STATIC_REQUIRE(std::is_copy_constructible_v<const_iterator>);
+        auto ca_copy = ca;
+        ++ca_copy;
+        REQUIRE(ca == cb);
+        REQUIRE(*ca == *cb);
+      }
+
+      // Singular iterators
       // iterator
       STATIC_REQUIRE(traits::has_equality_comparator_v<iterator>);
-      STATIC_REQUIRE(std::is_convertible_v<decltype(std::declval<iterator>() != std::declval<iterator>()), bool>);
+      STATIC_REQUIRE(std::is_default_constructible_v<iterator>);
+      { REQUIRE(iterator{} == iterator{}); }
       // const_iterator
       STATIC_REQUIRE(traits::has_equality_comparator_v<const_iterator>);
-      STATIC_REQUIRE(
-          std::is_convertible_v<decltype(std::declval<const_iterator>() != std::declval<const_iterator>()), bool>);
+      STATIC_REQUIRE(std::is_default_constructible_v<const_iterator>);
+      { REQUIRE(const_iterator{} == const_iterator{}); }
 
-      // i != j (contextually convertible)
+      // i++
       // iterator
-      STATIC_REQUIRE(traits::has_inequality_comparator_v<iterator>);
-      STATIC_REQUIRE(std::is_constructible_v<bool, decltype(std::declval<iterator>() != std::declval<iterator>())>);
-      // const_ iterator
-      STATIC_REQUIRE(traits::has_inequality_comparator_v<const_iterator>);
-      STATIC_REQUIRE(
-          std::is_constructible_v<bool, decltype(std::declval<const_iterator>() != std::declval<const_iterator>())>);
-
-      // *i
-      // iterator
-      STATIC_REQUIRE(traits::has_indirection_v<iterator>);
-      STATIC_REQUIRE(traits::has_reference_v<iterator>);
-      STATIC_REQUIRE(std::is_same_v<std::iterator_traits<iterator>::reference, decltype(*std::declval<iterator>())>);
-      STATIC_REQUIRE(traits::has_value_type_v<iterator>);
-      STATIC_REQUIRE(
-          std::is_convertible_v<decltype(*std::declval<iterator>()), std::iterator_traits<iterator>::value_type>);
-      // const_iterator
-      STATIC_REQUIRE(traits::has_indirection_v<const_iterator>);
-      STATIC_REQUIRE(traits::has_reference_v<const_iterator>);
-      STATIC_REQUIRE(
-          std::is_same_v<std::iterator_traits<const_iterator>::reference, decltype(*std::declval<const_iterator>())>);
-      STATIC_REQUIRE(traits::has_value_type_v<const_iterator>);
-      STATIC_REQUIRE(std::is_convertible_v<decltype(*std::declval<const_iterator>()),
-                                           std::iterator_traits<const_iterator>::value_type>);
-
-      // i->m
-      // iterator
-      STATIC_REQUIRE(traits::has_member_of_pointer_v<iterator>);
-      STATIC_REQUIRE(traits::has_indirection_v<iterator>);
-      STATIC_REQUIRE(
-          std::is_same_v<decltype(std::declval<iterator>()->energy()), decltype((*std::declval<iterator>()).energy())>);
-      // const_iterator
-      STATIC_REQUIRE(traits::has_member_of_pointer_v<const_iterator>);
-      STATIC_REQUIRE(traits::has_indirection_v<const_iterator>);
-      STATIC_REQUIRE(std::is_same_v<decltype(std::declval<const_iterator>()->energy()),
-                                    decltype((*std::declval<const_iterator>()).energy())>);
-
-      // ++r
-      // iterator
-      STATIC_REQUIRE(traits::has_preincrement_v<iterator>);
-      STATIC_REQUIRE(std::is_same_v<decltype(++std::declval<iterator&>()), iterator&>);
-      // const_iterator
-      STATIC_REQUIRE(traits::has_preincrement_v<const_iterator>);
-      STATIC_REQUIRE(std::is_same_v<decltype(++std::declval<const_iterator&>()), const_iterator&>);
-
-      // (void)r++
-      // iterator
-      STATIC_REQUIRE(traits::has_preincrement_v<iterator>);
       STATIC_REQUIRE(traits::has_postincrement_v<iterator>);
-      STATIC_REQUIRE(
-          std::is_same_v<decltype((void)++std::declval<iterator&>()), decltype((void)std::declval<iterator&>()++)>);
+      STATIC_REQUIRE(std::is_same_v<decltype(std::declval<iterator&>()++), iterator>);
       // const_iterator
-      STATIC_REQUIRE(traits::has_preincrement_v<const_iterator>);
       STATIC_REQUIRE(traits::has_postincrement_v<const_iterator>);
-      STATIC_REQUIRE(std::is_same_v<decltype((void)++std::declval<const_iterator&>()),
-                                    decltype((void)std::declval<const_iterator&>()++)>);
+      STATIC_REQUIRE(std::is_same_v<decltype(std::declval<const_iterator&>()++), const_iterator>);
 
-      // *r++
+      // *i++
       // iterator
       STATIC_REQUIRE(traits::has_indirection_v<iterator>);
-      STATIC_REQUIRE(traits::has_value_type_v<std::iterator_traits<iterator>>);
+      STATIC_REQUIRE(traits::has_reference_v<std::iterator_traits<iterator>>);
       STATIC_REQUIRE(traits::has_postincrement_v<iterator>);
-      STATIC_REQUIRE(
-          std::is_convertible_v<decltype(*std::declval<iterator&>()++), std::iterator_traits<iterator>::value_type>);
+      STATIC_REQUIRE(std::is_same_v<decltype(*std::declval<iterator&>()++), std::iterator_traits<iterator>::reference>);
       // const_iterator
       STATIC_REQUIRE(traits::has_indirection_v<const_iterator>);
-      STATIC_REQUIRE(traits::has_value_type_v<std::iterator_traits<const_iterator>>);
+      STATIC_REQUIRE(traits::has_reference_v<std::iterator_traits<const_iterator>>);
       STATIC_REQUIRE(traits::has_postincrement_v<const_iterator>);
-      STATIC_REQUIRE(std::is_convertible_v<decltype(*std::declval<const_iterator&>()++),
-                                           std::iterator_traits<const_iterator>::value_type>);
+      STATIC_REQUIRE(std::is_same_v<decltype(*std::declval<const_iterator&>()++),
+                                    std::iterator_traits<const_iterator>::reference>);
 
       // iterator_category - not strictly necessary but advised
       // iterator
       STATIC_REQUIRE(traits::has_iterator_category_v<std::iterator_traits<iterator>>);
-      STATIC_REQUIRE(std::is_base_of_v<std::input_iterator_tag, std::iterator_traits<iterator>::iterator_category>);
+      DOCUMENTED_STATIC_FAILURE(
+          std::is_base_of_v<std::forward_iterator_tag, std::iterator_traits<iterator>::iterator_category>);
       // const_iterator
       STATIC_REQUIRE(traits::has_iterator_category_v<std::iterator_traits<const_iterator>>);
-      STATIC_REQUIRE(
-          std::is_base_of_v<std::input_iterator_tag, std::iterator_traits<const_iterator>::iterator_category>);
+      DOCUMENTED_STATIC_FAILURE(
+          std::is_base_of_v<std::forward_iterator_tag, std::iterator_traits<const_iterator>::iterator_category>);
 
-    } // end of LegacyInputIterator
+    } // end of LegacyForwardIterator
 
-    // Mutable LegacyForwardIterator (LegacyForwardIterator that is also LegacyOutputIterator):
-    // - reference same as value_type& or value_type&&
+    // --a
+    // iterator
+    DOCUMENTED_FAILURE(traits::has_predecrement_v<iterator>);
+    // STATIC_REQUIRE(std::is_same_v<iterator&, decltype(--std::declval<iterator&>())>);
+    // const_iterator
+    DOCUMENTED_FAILURE(traits::has_predecrement_v<const_iterator>);
+    // STATIC_REQUIRE(std::is_same_v<const_iterator&, decltype(--std::declval<const_iterator&>())>);
+
+    // a--
+    // iterator
+    DOCUMENTED_FAILURE(traits::has_postdecrement_v<iterator>);
+    // STATIC_REQUIRE(std::is_convertible_v<decltype(std::declval<iterator&>()--), const iterator &>);
+    // {
+    //   auto coll = CollectionType();
+    //   auto a = coll.begin();
+    //   auto b = coll.begin();
+    //   REQUIRE(--(++a) == b);
+    //   REQUIRE(a == b);
+    //   REQUIRE(--a == --b);
+    //   REQUIRE(a == b);
+    // }
+    // const_iterator
+    DOCUMENTED_FAILURE(traits::has_postdecrement_v<const_iterator>);
+    // STATIC_REQUIRE(std::is_convertible_v<decltype(std::declval<const_iterator&>()--), const const_iterator &>);
+    // {
+    //   auto coll = CollectionType();
+    //   auto a = coll.begin();
+    //   auto b = coll.begin();
+    //   REQUIRE(--(++a) == b);
+    //   REQUIRE(a == b);
+    //   REQUIRE(--a == --b);
+    //   REQUIRE(a == b);
+    // }
+
+    // *a--
     // iterator
     STATIC_REQUIRE(traits::has_reference_v<iterator>);
-    STATIC_REQUIRE(traits::has_value_type_v<iterator>);
-    DOCUMENTED_STATIC_FAILURE(
-        std::is_same_v<std::iterator_traits<iterator>::reference, std::iterator_traits<iterator>::value_type&> ||
-        std::is_same_v<std::iterator_traits<iterator>::reference, std::iterator_traits<iterator>::value_type&&>);
-    // const_iterator
-    STATIC_REQUIRE(traits::has_reference_v<const_iterator>);
-    STATIC_REQUIRE(traits::has_value_type_v<const_iterator>);
-    DOCUMENTED_STATIC_FAILURE(std::is_same_v<std::iterator_traits<const_iterator>::reference,
-                                             std::iterator_traits<const_iterator>::value_type&> ||
-                              std::is_same_v<std::iterator_traits<const_iterator>::reference,
-                                             std::iterator_traits<const_iterator>::value_type&&>);
-
-    // (Immutable) iterator:
-    // - reference same as const value_type& or const value_type&&
-    // iterator
-    STATIC_REQUIRE(traits::has_reference_v<iterator>);
-    STATIC_REQUIRE(traits::has_value_type_v<iterator>);
-    DOCUMENTED_STATIC_FAILURE(
-        std::is_same_v<std::iterator_traits<iterator>::reference, const std::iterator_traits<iterator>::value_type&> ||
-        std::is_same_v<std::iterator_traits<iterator>::reference, const std::iterator_traits<iterator>::value_type&&>);
-    // const_iterator
-    STATIC_REQUIRE(traits::has_reference_v<const_iterator>);
-    STATIC_REQUIRE(traits::has_value_type_v<const_iterator>);
-    DOCUMENTED_STATIC_FAILURE(std::is_same_v<std::iterator_traits<const_iterator>::reference,
-                                             const std::iterator_traits<const_iterator>::value_type&> ||
-                              std::is_same_v<std::iterator_traits<const_iterator>::reference,
-                                             const std::iterator_traits<const_iterator>::value_type&&>);
-
-    // DefaultConstructible
-    // iterator
-    STATIC_REQUIRE(std::is_default_constructible_v<iterator>);
-    // const_iterator
-    STATIC_REQUIRE(std::is_default_constructible_v<const_iterator>);
-
-    // Multipass guarantee
-    // iterator
-    {
-      CollectionType coll;
-      for (int i = 0; i < 3; ++i) {
-        coll.create();
-      }
-      // iterator
-      auto a = coll.begin();
-      auto b = coll.begin();
-      REQUIRE(a == b);
-      REQUIRE(*a == *b);
-      REQUIRE(++a == ++b);
-      REQUIRE(*a == *b);
-      STATIC_REQUIRE(std::is_copy_constructible_v<iterator>);
-      auto a_copy = a;
-      ++a_copy;
-      REQUIRE(a == b);
-      REQUIRE(*a == *b);
-
-      // const_iterator
-      auto ca = coll.cbegin();
-      auto cb = coll.cbegin();
-      REQUIRE(ca == cb);
-      REQUIRE(*ca == *cb);
-      REQUIRE(++ca == ++cb);
-      REQUIRE(*ca == *cb);
-      STATIC_REQUIRE(std::is_copy_constructible_v<const_iterator>);
-      auto ca_copy = ca;
-      ++ca_copy;
-      REQUIRE(ca == cb);
-      REQUIRE(*ca == *cb);
-    }
-
-    // Singular iterators
-    // iterator
-    STATIC_REQUIRE(traits::has_equality_comparator_v<iterator>);
-    STATIC_REQUIRE(std::is_default_constructible_v<iterator>);
-    { REQUIRE(iterator{} == iterator{}); }
-    // const_iterator
-    STATIC_REQUIRE(traits::has_equality_comparator_v<const_iterator>);
-    STATIC_REQUIRE(std::is_default_constructible_v<const_iterator>);
-    { REQUIRE(const_iterator{} == const_iterator{}); }
-
-    // i++
-    // iterator
-    STATIC_REQUIRE(traits::has_postincrement_v<iterator>);
-    STATIC_REQUIRE(std::is_same_v<decltype(std::declval<iterator&>()++), iterator>);
-    // const_iterator
-    STATIC_REQUIRE(traits::has_postincrement_v<const_iterator>);
-    STATIC_REQUIRE(std::is_same_v<decltype(std::declval<const_iterator&>()++), const_iterator>);
-
-    // *i++
-    // iterator
     STATIC_REQUIRE(traits::has_indirection_v<iterator>);
-    STATIC_REQUIRE(traits::has_reference_v<std::iterator_traits<iterator>>);
-    STATIC_REQUIRE(traits::has_postincrement_v<iterator>);
-    STATIC_REQUIRE(std::is_same_v<decltype(*std::declval<iterator&>()++), std::iterator_traits<iterator>::reference>);
+    DOCUMENTED_STATIC_FAILURE(traits::has_postdecrement_v<iterator>);
+    // STATIC_REQUIRE(std::is_same_v<iterator::reference, decltype(*std::declval<iterator&>()--)>);
     // const_iterator
+    STATIC_REQUIRE(traits::has_reference_v<const_iterator>);
     STATIC_REQUIRE(traits::has_indirection_v<const_iterator>);
-    STATIC_REQUIRE(traits::has_reference_v<std::iterator_traits<const_iterator>>);
-    STATIC_REQUIRE(traits::has_postincrement_v<const_iterator>);
-    STATIC_REQUIRE(
-        std::is_same_v<decltype(*std::declval<const_iterator&>()++), std::iterator_traits<const_iterator>::reference>);
+    DOCUMENTED_STATIC_FAILURE(traits::has_postdecrement_v<const_iterator>);
+    // STATIC_REQUIRE(std::is_same_v<const_iterator::reference, decltype(*std::declval<const_iterator&>()--)>);
 
-    // iterator_category - not strictly necessary but advised
-    // iterator
-    STATIC_REQUIRE(traits::has_iterator_category_v<std::iterator_traits<iterator>>);
-    DOCUMENTED_STATIC_FAILURE(
-        std::is_base_of_v<std::forward_iterator_tag, std::iterator_traits<iterator>::iterator_category>);
-    // const_iterator
-    STATIC_REQUIRE(traits::has_iterator_category_v<std::iterator_traits<const_iterator>>);
-    DOCUMENTED_STATIC_FAILURE(
-        std::is_base_of_v<std::forward_iterator_tag, std::iterator_traits<const_iterator>::iterator_category>);
-
-  } // end of LegacyForwardIterator
-
+  } // end of LegacyBidirectionalIterator
   SECTION("LegacyOutputIterator") {
 
     // is class type or pointer type
