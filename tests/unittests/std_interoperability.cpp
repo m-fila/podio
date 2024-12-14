@@ -554,35 +554,31 @@ TEST_CASE("Collection and iterator concepts", "[collection][container][iterator]
 
   SECTION("forward_iterator") {
     // iterator
-    DOCUMENTED_STATIC_FAILURE(std::forward_iterator<iterator>);
-    // {
-    //   REQUIRE(iterator{} == iterator{});
-    //   auto coll = CollectionType();
-    //   coll.create();
-    //   auto i = coll.begin();
-    //   auto j = coll.begin();
-    //   REQUIRE(i == j);
-    //   REQUIRE(++i == ++j);
-    //   i = coll.begin();
-    //   REQUIRE(((void)[](auto x) { ++x; }(i), *i) == *i);
-    //   Pointers and references obtained from a forward iterator into a range remain valid while the range exists.
-    //   Is this even unit-testable?
-    // }
+    STATIC_REQUIRE(std::forward_iterator<iterator>);
+    {
+      REQUIRE(iterator{} == iterator{});
+      auto coll = CollectionType();
+      coll.create();
+      auto i = coll.begin();
+      auto j = coll.begin();
+      REQUIRE(i == j);
+      REQUIRE(++i == ++j);
+      i = coll.begin();
+      REQUIRE(((void)[](auto x) { ++x; }(i), *i) == *i);
+    }
     // const_iterator
-    DOCUMENTED_STATIC_FAILURE(std::forward_iterator<const_iterator>);
-    // {
-    //   REQUIRE(iterator{} == iterator{});
-    //   auto coll = CollectionType();
-    //   coll.create();
-    //   auto i = coll.begin();
-    //   auto j = coll.begin();
-    //   REQUIRE(i == j);
-    //   REQUIRE(++i == ++j);W
-    //   i = coll.begin();
-    //   REQUIRE(((void)[](auto x) { ++x; }(i), *i) == *i);
-    //   Pointers and references obtained from a forward iterator into a range remain valid while the range exists.
-    //   Is this even unit-testable?
-    // }
+    STATIC_REQUIRE(std::forward_iterator<const_iterator>);
+    {
+      REQUIRE(iterator{} == iterator{});
+      auto coll = CollectionType();
+      coll.create();
+      auto i = coll.begin();
+      auto j = coll.begin();
+      REQUIRE(i == j);
+      REQUIRE(++i == ++j);
+      i = coll.begin();
+      REQUIRE(((void)[](auto x) { ++x; }(i), *i) == *i);
+    }
   }
 
   SECTION("bidirectional_iterator") {
@@ -1166,7 +1162,7 @@ TEST_CASE("Collection as range", "[collection][ranges][std]") {
   DOCUMENTED_STATIC_FAILURE(std::ranges::output_range<CollectionType, CollectionType::value_type>);
   DOCUMENTED_STATIC_FAILURE(std::ranges::output_range<CollectionType, CollectionType::value_type::mutable_type>);
   // std::range::forward_range
-  DOCUMENTED_STATIC_FAILURE(std::ranges::forward_range<CollectionType>);
+  STATIC_REQUIRE(std::ranges::forward_range<CollectionType>);
   // std::range::bidirectional_range
   DOCUMENTED_STATIC_FAILURE(std::ranges::bidirectional_range<CollectionType>);
   // std::range::random_access_range
@@ -1215,12 +1211,6 @@ TEST_CASE("Collection and std algorithms", "[collection][iterator][std]") {
 
 // helper concept for unsupported algorithm compilation test
 template <typename T>
-concept is_range_adjacent_findable = requires(T coll) {
-  std::ranges::adjacent_find(coll, [](const auto& a, const auto& b) { return a.cellID() == b.cellID(); });
-};
-
-// helper concept for unsupported algorithm compilation test
-template <typename T>
 concept is_range_sortable = requires(T coll) {
   std::ranges::sort(coll, [](const auto& a, const auto& b) { return a.cellID() < b.cellID(); });
 };
@@ -1257,8 +1247,14 @@ TEST_CASE("Collection and std ranges algorithms", "[collection][ranges][std]") {
   REQUIRE(subcoll[0].cellID() == 5);
   REQUIRE(subcoll[1].cellID() == 3);
 
+  auto adjacent_it =
+      std::ranges::adjacent_find(coll, [](const auto& a, const auto& b) { return a.cellID() == b.cellID(); });
+  REQUIRE(adjacent_it != std::end(coll));
+  auto target = std::begin(coll);
+  std::ranges::advance(target, 2);
+  REQUIRE(adjacent_it == target);
+
   // check that algorithms requiring unsupported iterator concepts won't compile
-  DOCUMENTED_STATIC_FAILURE(is_range_adjacent_findable<CollectionType>);
   DOCUMENTED_STATIC_FAILURE(is_range_sortable<CollectionType>);
   DOCUMENTED_STATIC_FAILURE(is_range_fillable<CollectionType>);
 }
