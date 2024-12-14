@@ -787,9 +787,13 @@ TEST_CASE("Collection and iterator concepts", "[collection][container][iterator]
 
   SECTION("contiguous_iterator_iterator") {
     // iterator
+    DOCUMENTED_STATIC_FAILURE(std::is_lvalue_reference_v<iterator::reference>);
+    DOCUMENTED_STATIC_FAILURE(std::same_as<iterator::value_type, std::remove_cvref_t<iterator::reference>>);
     DOCUMENTED_STATIC_FAILURE(std::contiguous_iterator<iterator>);
     // TODO check semantic requirements
     // const_iterator
+    DOCUMENTED_STATIC_FAILURE(std::is_lvalue_reference_v<const_iterator::reference>);
+    STATIC_REQUIRE(std::same_as<const_iterator::value_type, std::remove_cvref_t<const_iterator::reference>>);
     DOCUMENTED_STATIC_FAILURE(std::contiguous_iterator<const_iterator>);
     // TODO check semantic requirements
   }
