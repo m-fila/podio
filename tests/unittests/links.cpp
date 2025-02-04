@@ -1,6 +1,7 @@
 #include "catch2/catch_test_macros.hpp"
 #include "catch2/matchers/catch_matchers_vector.hpp"
 
+#include "podio/CollectionConcept.h"
 #include "podio/LinkCollection.h"
 #include "podio/LinkNavigator.h"
 
@@ -190,6 +191,10 @@ TEST_CASE("Links templated accessors", "[links]") {
   }
 }
 // NOLINTEND(clang-analyzer-cplusplus.NewDeleteLeaks)
+
+TEST_CASE("LinkCollection collection concept", "[links][concepts]") {
+  STATIC_REQUIRE(podio::Collection<TestLColl>);
+}
 
 TEST_CASE("LinkCollection constness", "[links][static-checks][const-correctness]") {
   // Test type-aliases in LinkCollection

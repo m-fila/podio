@@ -13,6 +13,7 @@
 #include "catch2/matchers/catch_matchers_vector.hpp"
 
 // podio specific includes
+#include "podio/CollectionConcept.h"
 #include "podio/Frame.h"
 #include "podio/GenericParameters.h"
 #include "podio/ROOTLegacyReader.h"
@@ -345,6 +346,15 @@ TEST_CASE("thread-safe prepareForWrite", "[basics][multithread]") {
   }
 }
 
+TEST_CASE("UserDataCollection collection concept", "[concepts]") {
+  // check each type in tuple
+  std::apply(
+      []<typename... Ts>(Ts...) {
+        ([]<typename T>(T) { STATIC_REQUIRE(podio::Collection<podio::UserDataCollection<T>>); }(Ts{}), ...);
+      },
+      podio::SupportedUserDataTypes{});
+}
+
 TEST_CASE("UserDataCollection print", "[basics]") {
   auto coll = podio::UserDataCollection<int32_t>();
   coll.push_back(1);
@@ -498,6 +508,11 @@ TEST_CASE("UserInitialization", "[basics][code-gen]") {
   REQUIRE(ex.comp().i == 42);
   REQUIRE(ex.comp().arr[0] == 1.2);
   REQUIRE(ex.comp().arr[1] == 3.4);
+}
+
+TEST_CASE("Collection concepts", "[collections][concepts]") {
+  STATIC_REQUIRE(podio::Collection<ExampleClusterCollection>);
+  STATIC_REQUIRE(podio::Collection<ExampleHitCollection>);
 }
 
 TEST_CASE("Collection size and empty", "[basics][collections]") {
