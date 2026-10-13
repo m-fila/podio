@@ -820,6 +820,17 @@ TEST_CASE("LinkCollection construction from range", "[links][basics]") {
   REQUIRE_THROWS_AS(TestLColl::from(links), std::invalid_argument);
 }
 
+TEST_CASE("LinkCollection append range", "[links][basics]") {
+  TestLColl collection;
+  auto first = collection.create();
+  std::vector<TestMutL> additional(2);
+
+  collection.append_range(additional);
+
+  REQUIRE(collection.size() == 3);
+  REQUIRE(*collection.begin() == first);
+}
+
 #if defined(__cpp_lib_containers_ranges)
 TEST_CASE("LinkCollection construction from ranges::to", "[links][range]") {
   using namespace std::views;

@@ -144,6 +144,11 @@ public:
   /// Does not invalidate iterators.
   void push_back(const {{ class.bare_type }}& object);
 
+  /// Append the elements of a range to the collection.
+  /// Does not invalidate iterators.
+  template<podio::detail::RangeConvertibleTo<value_type> R>
+  void append_range(R&& range);
+
   void prepareForWrite() const final;
   void prepareAfterRead() final;
   bool setReferences(const podio::ICollectionProvider* collectionProvider) final;
@@ -256,9 +261,7 @@ template<podio::detail::RangeConvertibleTo<{{ class.bare_type }}Collection::valu
   : {{ class.bare_type }}Collection() {
   setSubsetCollection(podio::detail::RangeOf<R, value_type>);
 
-  for (auto&& elem : range) {
-    push_back(std::forward<decltype(elem)>(elem));
-  }
+  append_range(std::forward<R>(range));
 }
 #endif
 
@@ -269,11 +272,16 @@ template<podio::detail::RangeConvertibleTo<{{ class.bare_type }}Collection::valu
     coll.setSubsetCollection();
   }
 
-  for (auto&& elem : range) {
-    coll.push_back(std::forward<decltype(elem)>(elem));
-  }
+  coll.append_range(std::forward<R>(range));
 
   return coll;
+}
+
+template<podio::detail::RangeConvertibleTo<{{ class.bare_type }}Collection::value_type> R>
+void {{ class.bare_type }}Collection::append_range(R&& range) {
+  for (auto&& elem : range) {
+    push_back(std::forward<decltype(elem)>(elem));
+  }
 }
 
 

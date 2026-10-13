@@ -80,9 +80,7 @@ public:
       setSubsetCollection();
     }
 
-    for (auto&& elem : range) {
-      push_back(std::forward<decltype(elem)>(elem));
-    }
+    append_range(std::forward<R>(range));
   }
 #endif
 
@@ -113,14 +111,7 @@ public:
       coll.setSubsetCollection();
     }
 
-    // NOTE: We cannot use ranges::copy here, because that will always resolve
-    // to only one of the push_back overloads, specifically the one taking
-    // value_type. See, e.g.: https://godbolt.org/z/seqdh79rr
-    // Additionally, we want no reference in the loop variable to make sure we
-    // get the correct handle type depending on the range we pass in
-    for (auto&& elem : range) {
-      coll.push_back(std::forward<decltype(elem)>(elem));
-    }
+    coll.append_range(std::forward<R>(range));
 
     return coll;
   }
@@ -223,6 +214,19 @@ public:
           "Object needs to be tracked by another collection in order for it to be storable in a subset collection");
     }
     m_storage.entries.push_back(obj.release());
+  }
+
+  /// Append the elements of a range to the collection without invalidating iterators.
+  template <detail::RangeConvertibleTo<value_type> R>
+  void append_range(R&& range) {
+    // NOTE: We cannot use ranges::copy here, because that will always resolve
+    // to only one of the push_back overloads, specifically the one taking
+    // value_type. See, e.g.: https://godbolt.org/z/seqdh79rr
+    // Additionally, we want no reference in the loop variable to make sure we
+    // get the correct handle type depending on the range we pass in
+    for (auto&& elem : range) {
+      push_back(std::forward<decltype(elem)>(elem));
+    }
   }
 
   /// Number of elements in the collection

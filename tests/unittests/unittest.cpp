@@ -478,6 +478,13 @@ TEST_CASE("UserDataCollection construct from range", "[basics]") {
   REQUIRE_THAT(coll2.vec(), Equals(std::vector{1.0f, 3.0f, 4.0f}));
 }
 
+TEST_CASE("UserDataCollection append range", "[basics]") {
+  auto coll = podio::UserDataCollection<int32_t>::from(std::array{1, 2});
+  coll.append_range(std::array{3, 4});
+  using Catch::Matchers::Equals;
+  REQUIRE_THAT(coll.vec(), Equals(std::vector{1, 2, 3, 4}));
+}
+
 #if defined(__cpp_lib_containers_ranges)
 TEST_CASE("UserDataCollection construct from ranges::to", "[basics]") {
   using namespace std::views;
@@ -744,6 +751,17 @@ TEST_CASE("Collection construction from range", "[basics][collections]") {
   // Cannot construct a collection from a range of mutable handles that are
   // already owned
   REQUIRE_THROWS_AS(ExampleClusterCollection::from(clusters), std::invalid_argument);
+}
+
+TEST_CASE("Collection append range", "[basics][collections]") {
+  ExampleClusterCollection collection;
+  auto first = collection.create();
+  std::vector<MutableExampleCluster> additional(2);
+
+  collection.append_range(additional);
+
+  REQUIRE(collection.size() == 3);
+  REQUIRE(*collection.begin() == first);
 }
 
 #if defined(__cpp_lib_containers_ranges)

@@ -308,6 +308,8 @@ concept CollectionType = !std::is_abstract_v<T> && std::derived_from<T, Collecti
                                                        // stripped to be same as expected typedef
       { t.push_back(std::declval<std::add_lvalue_reference_t<std::add_const_t<typename T::mutable_type>>>()) };
       { t.push_back(std::declval<std::add_lvalue_reference_t<std::add_const_t<typename T::value_type>>>()) };
+      { t.append_range(std::ranges::empty_view<typename T::mutable_type>{}) };
+      { t.append_range(std::ranges::empty_view<typename T::value_type>{}) };
       { t.begin() } -> std::same_as<typename T::iterator>;
       { t.cbegin() } -> std::same_as<typename T::const_iterator>;
       { ct.begin() } -> std::same_as<typename T::const_iterator>;

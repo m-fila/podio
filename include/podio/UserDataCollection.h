@@ -314,6 +314,16 @@ public:
     _vec.push_back(value);
   }
 
+  /// Append the elements of a range, invalidating iterators if the vector reallocates.
+  template <detail::RangeConvertibleTo<BasicType> R>
+  void append_range(R&& range) {
+#if defined(__cpp_lib_containers_ranges)
+    _vec.append_range(std::forward<R>(range));
+#else
+    std::ranges::copy(std::forward<R>(range), std::back_inserter(_vec));
+#endif
+  }
+
   /// access to the actual data vector
   typename std::vector<BasicType>& vec() {
     return _vec;
