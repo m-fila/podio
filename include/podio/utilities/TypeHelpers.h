@@ -302,14 +302,22 @@ concept CollectionType = !std::is_abstract_v<T> && std::derived_from<T, Collecti
       requires std::random_access_iterator<typename T::const_reverse_iterator>;
       typename T::reverse_iterator;
       requires std::random_access_iterator<typename T::reverse_iterator>;
+      // construction from a range
+      // using example range as a placeholder
+      { T::from(std::ranges::empty_view<typename T::mutable_type>{}) } -> std::same_as<T>;
+      { T::from(std::ranges::empty_view<typename T::value_type>{}) } -> std::same_as<T>;
+#if defined(__cpp_lib_containers_ranges)
+      requires std::constructible_from<T, std::from_range_t, std::ranges::empty_view<typename T::mutable_type>>;
+      requires std::constructible_from<T, std::from_range_t, std::ranges::empty_view<typename T::value_type>>;
+#endif
       // member functions
       requires std::same_as<std::remove_reference_t<decltype(t.create())>,
                             typename T::mutable_type>; // UserDataCollection::create() returns reference which has to be
                                                        // stripped to be same as expected typedef
       { t.push_back(std::declval<std::add_lvalue_reference_t<std::add_const_t<typename T::mutable_type>>>()) };
       { t.push_back(std::declval<std::add_lvalue_reference_t<std::add_const_t<typename T::value_type>>>()) };
-      { t.append_range(std::ranges::empty_view<typename T::mutable_type>{}) };
-      { t.append_range(std::ranges::empty_view<typename T::value_type>{}) };
+      { t.append_range(std::ranges::empty_view<typename T::mutable_type>{}) }; // using example range as a placeholder
+      { t.append_range(std::ranges::empty_view<typename T::value_type>{}) };   // using example range as a placeholder
       { t.begin() } -> std::same_as<typename T::iterator>;
       { t.cbegin() } -> std::same_as<typename T::const_iterator>;
       { ct.begin() } -> std::same_as<typename T::const_iterator>;
